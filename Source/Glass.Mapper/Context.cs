@@ -163,6 +163,15 @@ namespace Glass.Mapper
                 //first we have to add each type config to the collection
                 foreach (var typeConfig in typeConfigurations)
                 {
+
+                    //don't load generic types
+                    //see https://github.com/mikeedwards83/Glass.Mapper/issues/85
+                    if (typeConfig.Type.IsGenericTypeDefinition)
+                    {
+                        continue;
+                    }
+
+
                     if(TypeConfigurations.ContainsKey(typeConfig.Type)){
                         Log.Warn("Tried to add type {0} to TypeConfigurationDictioary twice".Formatted(typeConfig.Type));
                         continue;
@@ -194,7 +203,7 @@ namespace Glass.Mapper
         {
             DataMapperResolver runner = new DataMapperResolver(DependencyResolver.ResolveAll<IDataMapperResolverTask>());
 
-            foreach(var property in properties)
+            foreach(var property in properties.Where(x=>x.Mapper == null))
             {
 
                 DataMapperResolverArgs args = new DataMapperResolverArgs(this, property);
@@ -226,7 +235,8 @@ namespace Glass.Mapper
         /// </summary>
         /// <param name="obj">The obj.</param>
         /// <returns>AbstractTypeConfiguration.</returns>
-        public T GetTypeConfiguration<T>(Type type, bool doNotLoad = false, bool checkBase = true) where T : AbstractTypeConfiguration, new()
+        public T GetTypeConfiguration<T>(Type type, bool doNotLoad = false, bool checkBase = true)
+            where T : AbstractTypeConfiguration, new()
         {
 
 
@@ -235,30 +245,26 @@ namespace Glass.Mapper
 
             if (config != null) return config as T;
 
-            if (checkBase)
+            if (checkBase && type.BaseType != null)
             {
                 //check base type encase of proxy
-                 if (type.BaseType != null)
-            {
                 config = TypeConfigurations.ContainsKey(type.BaseType) ? TypeConfigurations[type.BaseType] : null;
             }
 
-                if (config != null) return config as T;
+            if (config != null) return config as T;
 
-                //check interfaces encase this is an interface proxy
-                string name = type.Name;
-                //ME - I added the OrderByDescending in response to issue 53
-                // raised on the Glass.Sitecore.Mapper project. Longest name should be compared first
-                // to get the most specific interface
-                var interfaceType =
-                    type.GetInterfaces()
-                        .OrderByDescending(x => x.Name.Length)
-                        .FirstOrDefault(x => name.Contains(x.Name));
+            //check interfaces encase this is an interface proxy
+            string name = type.Name;
+            //ME - I added the OrderByDescending in response to issue 53
+            // raised on the Glass.Sitecore.Mapper project. Longest name should be compared first
+            // to get the most specific interface
+            var interfaceType =
+                type.GetInterfaces()
+                    .OrderByDescending(x => x.Name.Length)
+                    .FirstOrDefault(x => name.Contains(x.Name));
 
-                if (interfaceType != null)
-                    config = TypeConfigurations.ContainsKey(interfaceType) ? TypeConfigurations[interfaceType] : null;
-
-            }
+            if (interfaceType != null)
+                config = TypeConfigurations.ContainsKey(interfaceType) ? TypeConfigurations[interfaceType] : null;
 
             if (config == null && !doNotLoad)
             {
