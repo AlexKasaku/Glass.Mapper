@@ -13,7 +13,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  
-*/ 
+*/
 //-CRE-
 
 
@@ -42,6 +42,7 @@ namespace Glass.Mapper.Sc.Tests.Configuration.Attributes
         [TestCase("FieldName")]
         [TestCase("Setting")]
         [TestCase("ReadOnly")]
+        [TestCase("DefaultValue")]
         public void Does_SitecoreFieldAttribute_Have_Properties(string fieldName)
         {
             var properties = typeof(SitecoreFieldAttribute).GetProperties();
@@ -102,7 +103,7 @@ namespace Glass.Mapper.Sc.Tests.Configuration.Attributes
             //Assign
             SitecoreFieldAttribute attr = new SitecoreFieldAttribute(string.Empty);
             var propertyInfo = typeof(StubClass).GetProperty("DummyProperty");
-            
+
             attr.Setting = SitecoreFieldSettings.DontLoadLazily;
 
             //Act

@@ -42,6 +42,7 @@ namespace Glass.Mapper.Tests.Configuration.Attributes
 
         [Test]
         [TestCase("ReadOnly")]
+        [TestCase("DefaultValue")]
         public void Does_FieldAttribute_Have_Properties(string propertyName)
         {
             var properties = typeof(FieldAttribute).GetProperties();
@@ -63,8 +64,28 @@ namespace Glass.Mapper.Tests.Configuration.Attributes
 
             //Assert
             Assert.AreEqual(propertyInfo, config.PropertyInfo);
-          //  Assert.IsNullOrEmpty(config.Name);
+            Assert.IsNull(config.DefaultValue);
             Assert.IsFalse(config.ReadOnly);
+        }
+
+        [Test]
+        public void Configure_DefaultValueSet_DefaultValueSetOnConfig()
+        {
+            //Act
+            var attr = new StubFieldAttribute();
+            var config = new FieldConfiguration();
+            var propertyInfo = typeof(StubItem).GetProperty("X");
+
+            const string testValue = "test value";
+
+            attr.DefaultValue = testValue;
+
+            //Act
+            attr.Configure(propertyInfo, config);
+
+            //Assert
+            Assert.AreEqual(propertyInfo, config.PropertyInfo);
+            Assert.AreEqual(testValue, config.DefaultValue);
         }
 
         [Test]

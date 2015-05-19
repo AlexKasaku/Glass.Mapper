@@ -42,6 +42,11 @@ namespace Glass.Mapper
         public bool ReadOnly { get;  set; }
 
         /// <summary>
+        /// Allows specification of a default value to be returned if mapping fails
+        /// </summary>
+        public object DefaultDataValue { get; set; }
+
+        /// <summary>
         /// The property this Data Mapper will populate
         /// </summary>
         /// <value>The configuration.</value>
@@ -57,7 +62,7 @@ namespace Glass.Mapper
 
             try
             {
-                 result = MapToProperty(mappingContext);
+                 result = MapToProperty(mappingContext) ?? DefaultDataValue;
             }
             catch (Exception ex)
             {
@@ -79,7 +84,10 @@ namespace Glass.Mapper
 
             try
             {
-                mappingContext.PropertyValue = Configuration.PropertyGetter(mappingContext.Object);
+                var propertyValue = Configuration.PropertyGetter(mappingContext.Object);
+
+                if (DefaultDataValue != null && propertyValue != DefaultDataValue)
+                    mappingContext.PropertyValue = propertyValue;
             }
             catch (Exception ex)
             {

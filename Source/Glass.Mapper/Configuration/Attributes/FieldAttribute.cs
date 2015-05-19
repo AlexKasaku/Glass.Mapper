@@ -39,6 +39,11 @@ namespace Glass.Mapper.Configuration.Attributes
         public bool ReadOnly { get; set; }
 
         /// <summary>
+        /// Allows specification of a default value to be returned if mapping fails
+        /// </summary>
+        public object DefaultValue { get; set; }
+
+        /// <summary>
         /// Configures the specified property info.
         /// </summary>
         /// <param name="propertyInfo">The property info.</param>
@@ -46,6 +51,8 @@ namespace Glass.Mapper.Configuration.Attributes
         public void Configure(PropertyInfo propertyInfo, FieldConfiguration config)
         {
             config.ReadOnly = ReadOnly;
+            config.DefaultValue = DefaultValue;
+
             base.Configure(propertyInfo, config);
         }
     }

@@ -59,6 +59,27 @@ namespace Glass.Mapper.Tests
             //Assert
             Assert.AreEqual("Hello world", obj.AProperty);
             Assert.AreEqual(context, dataMapper.MappingContext);
+        }
+
+        [Test]
+        public void MapCmsToProperty_NullValueFromCmsWithDefaultDataValue_WritesDefaultDataValueToProperty()
+        {
+            //Assign
+            var obj = new StubClass();
+            var config = Substitute.For<AbstractPropertyConfiguration>();
+            var dataMapper = new StubNullMapper();
+
+            AbstractDataMappingContext context = Substitute.For<AbstractDataMappingContext>(obj);
+            dataMapper.Setup(new DataMapperResolverArgs(null, config));
+            dataMapper.DefaultDataValue = "Default value";
+            config.PropertyInfo = typeof(StubClass).GetProperties().First(x => x.Name == "AProperty");
+
+            //Act
+            dataMapper.MapCmsToProperty(context);
+
+            //Assert
+            Assert.AreEqual("Default value", obj.AProperty);
+            Assert.AreEqual(context, dataMapper.MappingContext);
 
         }
 
@@ -85,6 +106,28 @@ namespace Glass.Mapper.Tests
             {
                 this.MappingContext = mappingContext;
                 return "Hello world";
+            }
+
+            public override bool CanHandle(AbstractPropertyConfiguration configuration, Context context)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public class StubNullMapper : AbstractDataMapper
+        {
+
+            public AbstractDataMappingContext MappingContext { get; set; }
+            public override void MapToCms(AbstractDataMappingContext mappingContext)
+            {
+                throw new NotImplementedException();
+
+            }
+
+            public override object MapToProperty(AbstractDataMappingContext mappingContext)
+            {
+                this.MappingContext = mappingContext;
+                return null;
             }
 
             public override bool CanHandle(AbstractPropertyConfiguration configuration, Context context)

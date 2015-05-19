@@ -19,6 +19,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Glass.Mapper.Configuration;
+using Glass.Mapper.Pipelines.DataMapperResolver;
 using Glass.Mapper.Umb.Configuration;
 using Umbraco.Core.Models;
 
@@ -137,6 +139,15 @@ namespace Glass.Mapper.Umb.DataMappers
         {
             return configuration is UmbracoPropertyConfiguration &&
                    TypesHandled.Any(x => x == configuration.PropertyInfo.PropertyType);
+        }
+
+        public override void Setup(DataMapperResolverArgs args)
+        {
+            var scArgs = args.PropertyConfiguration as FieldConfiguration;
+            this.ReadOnly = scArgs.ReadOnly;
+            this.DefaultDataValue = scArgs.DefaultValue;
+
+            base.Setup(args);
         }
     }
 

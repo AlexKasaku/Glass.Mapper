@@ -191,6 +191,7 @@ namespace Glass.Mapper.Sc.DataMappers
         {
             var scArgs = args.PropertyConfiguration as FieldConfiguration;
             this.ReadOnly = scArgs.ReadOnly;
+            this.DefaultDataValue = scArgs.DefaultValue;
             base.Setup(args);
         }
         

@@ -29,6 +29,11 @@ namespace Glass.Mapper.Configuration
         /// </summary>
         /// <value><c>true</c> if [read only]; otherwise, <c>false</c>.</value>
         public bool ReadOnly { get; set; }
+
+        /// <summary>
+        /// Allows specification of a default value to be returned if mapping fails
+        /// </summary>
+        public object DefaultValue { get; set; }
     }
 }
 
